@@ -1,11 +1,17 @@
 import './App.css';
+import {BrowserRouter, Routes, Route } from "react-router-dom";
+import Navbar from './components/Navbar';
+import DocumentsSection from './components/DocumentsSection';
 
 function App() {
   return (
-    <div className="App">
-      <h1>Document Manager</h1>
-      <p>OXFAM</p>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path='/' element={<Navbar />}>
+          <Route path='documents' element={<DocumentsSection />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 

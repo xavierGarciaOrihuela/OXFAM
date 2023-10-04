@@ -1,11 +1,14 @@
 var express = require('express');
 var multer = require('multer');
+var cors = require('cors');
 const fs = require('fs');
 
 
 const filesFolderPath = __dirname + "/documents/";
 
-const app = express();
+var app = express();
+
+app.use(cors());
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, filesFolderPath); // La carpeta ha d'existir
@@ -29,7 +32,7 @@ app.get('/documents', function (req, res) {
         }
 
         const filenames = files.map((file) => ({ name: file }));
-        res.status(200).json({'files': filenames});
+        res.status(200).json(filenames);
     });
 });
 

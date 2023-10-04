@@ -77,5 +77,5 @@ app.delete('/documents/:fileName', async (req, res) => {
 
 
 app.listen(3001, function () {
-    console.log('Listening on the port 3000!');
+    console.log('Listening on the port 3001!');
 });

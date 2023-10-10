@@ -1,6 +1,9 @@
 import React from "react";
 import { useState,useEffect } from "react";
 import axios from "axios";
+import * as AiIcons from 'react-icons/ai';
+
+import DocumentsListItem from "./DocumentsListItem";
 
 import backendURL from "../global";
 
@@ -19,7 +22,8 @@ function DocumentsSection() {
     };
 
     function filterDocuments (filterValue) {
-        const filtered = documents.filter(document => document.name.startsWith(filterValue));
+        const lowerCaseValue = filterValue.toLowerCase();
+        const filtered = documents.filter(document => document.name.toLowerCase().startsWith(lowerCaseValue));
         SetDisplayedDocuments(filtered);
     };
 
@@ -40,22 +44,28 @@ function DocumentsSection() {
 
     return (
         <>
-            <h1>Documents</h1>
-            <div>
-                <input type="file" onChange={(e) => handleFileSelection(e.target.files[0])}></input>
+            <div className="documents-header">
+                <div className="documents-search-bar">
+                    <input className="documents-search-bar-input" type="text" placeholder="Search documents..." value={searchInput} onChange={(e) => {
+                        SetSearchInput(e.target.value)
+                        filterDocuments(e.target.value)
+                    }}></input>
+                    <AiIcons.AiOutlineSearch />
+                </div>
+                <div className="documents-upload-button">
+                    <input type="file" id="file" onChange={(e) => handleFileSelection(e.target.files[0])} hidden/>
+                    <label for="file" className="documents-upload-button-text"><span><AiIcons.AiOutlineUpload/> New file</span></label>
+                </div>
             </div>
-            <div>
-                <input type="text" placeholder="Cerca documents..." value={searchInput} onChange={(e) => {
-                    SetSearchInput(e.target.value)
-                    filterDocuments(e.target.value)
-                }}></input>
-            </div>
+            
             <p style={{color: "green"}}>{message}</p>
-            {displayedDocuments.map((item, index) => {
-                return (
-                    <p>{item.name}</p>
-                );
-            })}
+            <div className="documents-list">
+                {displayedDocuments.map((item, index) => {
+                    return (
+                        <DocumentsListItem name={item.name}></DocumentsListItem>
+                    );
+                })}
+            </div>
         </>
     );
 };

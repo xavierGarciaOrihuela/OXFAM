@@ -51,7 +51,7 @@ app.post('/documents', upload.single('File'), function (req, res) {
 // Endpoint per obtenir un fitxer donat el nom
 app.get('/documents/:fileName', function (req, res) {
     const fileName = req.params.fileName;
-    const filePath = filesFolderPath + fileName + '.pdf'; // Make sure the path is correct
+    const filePath = filesFolderPath + fileName; // Make sure the path is correct
 
     // Use res.sendFile() to send the file to the client
     res.sendFile(filePath, (err) => {
@@ -64,7 +64,7 @@ app.get('/documents/:fileName', function (req, res) {
 // Endpoint per eliminar un fitxer donat el nom
 app.delete('/documents/:fileName', async (req, res) => {
     const fileName = req.params.fileName;
-    const filePath = filesFolderPath + fileName + '.pdf'; // Make sure the path is correct
+    const filePath = filesFolderPath + fileName; // Make sure the path is correct
   
     try {
       // Utilitzem fs.promises.unlink per eliminar el fitxer
@@ -72,7 +72,7 @@ app.delete('/documents/:fileName', async (req, res) => {
       res.status(204);
     } catch (error) {
       // Gestionem els errors, per exemple, si no es troba el fitxer
-      console.error(`Error while trying to delete ${fileName}.pdf.`, error);
+      console.error(`Error while trying to delete ${fileName}`, error);
       res.status(404).send('File not found');
     }
   });

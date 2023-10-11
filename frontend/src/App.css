@@ -2,7 +2,7 @@
 
 :root {
   --font-family: 'Gabarito', cursive;
-  --background-color: rgb(228, 227, 227);
+  --background-color: rgb(233, 233, 233);
   --font-color: black;
   --side-color: #bdc3c7;
   --nav-hr-color: lightgrey;
@@ -12,6 +12,7 @@
   --nav-font-size: 1.2em;
   --documents-header-element-height: 50px;
   --rectuangular-border-radius: 5px;
+  --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 
@@ -101,14 +102,44 @@ body {
 
 .documents-list {
   flex: 1;
+  overflow-y: scroll;
 }
 
 .documents-list-item {
   display: block;
-  height: 50px;
+  height: 70px;
   border-radius: var(--rectuangular-border-radius);
   background-color: var(--documents-list-item-color);
   margin-top: 20px;
+  box-shadow: var(--box-shadow);
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+}
+
+.documents-list-item-link {
+  flex: 1;
+  text-decoration: none;
+  color: var(--font-color);
+}
+
+.documents-list-item-link:hover {
+  color: var(--upload-button-color);
+}
+
+.documents-list-item-delete-button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.documents-list-item-delete-button > svg{
+  display: block;
+  font-size: 1.75em;
+}
+
+.documents-list-item-delete-button > svg:hover{
+  color: red;
 }
 
 .documents-search-bar {
@@ -120,6 +151,7 @@ body {
   padding: 20px;
   display: flex;
   align-items: center;
+  box-shadow: var(--box-shadow);
 }
 
 .documents-search-bar-input {
@@ -133,6 +165,7 @@ body {
   height: var(--documents-header-element-height);
   background-color: var(--upload-button-color);
   border-radius: var(--rectuangular-border-radius);
+  box-shadow: var(--box-shadow);
 }
 
 .documents-upload-button-text {

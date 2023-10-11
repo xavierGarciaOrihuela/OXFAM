@@ -21,6 +21,11 @@ function DocumentsSection() {
         })
     };
 
+    function handleDeleteDocument(documentName) {
+        axios.delete(`${backendURL}/documents/${documentName}`);
+        getDocuments();
+    };
+
     function filterDocuments (filterValue) {
         const lowerCaseValue = filterValue.toLowerCase();
         const filtered = documents.filter(document => document.name.toLowerCase().startsWith(lowerCaseValue));
@@ -62,7 +67,7 @@ function DocumentsSection() {
             <div className="documents-list">
                 {displayedDocuments.map((item, index) => {
                     return (
-                        <DocumentsListItem name={item.name}></DocumentsListItem>
+                        <DocumentsListItem name={item.name} callback={handleDeleteDocument}></DocumentsListItem>
                     );
                 })}
             </div>

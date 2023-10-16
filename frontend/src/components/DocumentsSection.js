@@ -23,7 +23,10 @@ function DocumentsSection() {
 
     function handleDeleteDocument(documentName) {
         axios.delete(`${backendURL}/documents/${documentName}`);
-        getDocuments();
+        // Això, en lloc de fer-ho amb .filter() que és O(N), caldria fer-ho amb una cerca binaria per Documents i agafant l'index a DisplayedDocuments
+        // Com això és un prototipus i no estarem treballant amb molts documents, no notarem molt el temps d'execució d'això, però si s'escala l'aplicació, és un dels punts que més afectarà l'eficiència.
+        SetDisplayedDocuments(displayedDocuments.filter((document) => document.name !== documentName));
+        SetDocuments(documents.filter((document) => document.name !== documentName));
     };
 
     function filterDocuments (filterValue) {

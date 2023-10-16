@@ -179,3 +179,7 @@ body {
   font-size: 1.2em;
   cursor: pointer;
 }
+
+.document-viewer {
+  flex: 1;
+}

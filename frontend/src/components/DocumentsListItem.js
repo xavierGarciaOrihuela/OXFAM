@@ -6,7 +6,7 @@ function DocumentsListItem ({name, callback}) {
 
     return (
         <div className="documents-list-item">
-            <Link to="/" className="documents-list-item-link">
+            <Link to={`/documents/${name}`} className="documents-list-item-link">
                 <p>{name}</p>
             </Link>
             <div className="documents-list-item-delete-button" onClick={() => {callback(name)}}>

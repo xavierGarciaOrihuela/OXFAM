@@ -1,5 +1,6 @@
 import * as AiIcons from 'react-icons/ai';
 import * as BsIcons from 'react-icons/bs';
+import * as PiIcons from 'react-icons/pi'
 
 export const SidebarData = [
     {
@@ -13,9 +14,9 @@ export const SidebarData = [
         icon: <BsIcons.BsFileEarmarkPdf/>,
     },
     {
-        title: 'Search',
-        path: '/search',
-        icon: <AiIcons.AiOutlineSearch />,
+        title: 'Chat',
+        path: '/chat',
+        icon: <PiIcons.PiChatsCircle />,
     }
 ]
 

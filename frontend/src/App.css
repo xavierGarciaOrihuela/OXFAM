@@ -197,6 +197,7 @@ body {
 .chat-footer-input {
   flex: 1;
   border: none;
+  outline: none;
   border-radius: var(--rectuangular-border-radius);
   height: var(--chat-footer-element-height);
   padding: 20px;
@@ -211,6 +212,5 @@ body {
   background-color: var(--blue-color);
   color: white;
   font-size: 1.1em;
-  text-align: center;
   cursor: pointer;
 }

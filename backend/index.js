@@ -75,7 +75,18 @@ app.delete('/documents/:fileName', async (req, res) => {
       console.error(`Error while trying to delete ${fileName}`, error);
       res.status(404).send('File not found');
     }
-  });
+});
+
+// Endpoint per obtenir una resposta a una pregunta per al chat general
+// Cal afegir un query parameter al endpoint per a que funcioni: http://localhost:3001/general_chat?question=Test
+app.get('/general_chat', async (req, res) => {
+  let question = req.query.question;
+  if(question === undefined) return res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
+  if(question === '') return res.status(400).send('The question parameter is empty.');
+  let answer = 'Això és una resposta temporal';
+  let sources = ['Grup PAE OXFAM', 'Temp Source', 'Informe 1', 'Informe 2'];
+  return res.status(200).json({'question': question, 'answer': answer, 'sources': sources});
+});
 
 
 

@@ -84,7 +84,7 @@ app.get('/general_chat', async (req, res) => {
   if(question === undefined) return res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
   if(question === '') return res.status(400).send('The question parameter is empty.');
   let answer = 'Això és una resposta temporal';
-  let sources = ['Grup PAE OXFAM', 'Temp Source', 'Informe 1', 'Informe 2'];
+  let sources = ['Grup PAE OXFAM', 'Temp Source', 'Informe 1', 'Informe 2', 'Lorem ipsum.pdf'];
   return res.status(200).json({'question': question, 'answer': answer, 'sources': sources});
 });
 

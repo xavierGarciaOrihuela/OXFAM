@@ -14,6 +14,8 @@
   --chat-footer-element-height: 50px;
   --rectuangular-border-radius: 5px;
   --box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  --user-message-color: whitesmoke;
+  --computer-message-color: grey;
 }
 
 
@@ -187,11 +189,32 @@ body {
 
 .chat-container {
   flex: 1;
+  overflow-y: scroll;
+}
+
+.message {
+  border-radius: var(--rectuangular-border-radius);
+  display: block;
+  padding: 20px;
+}
+
+.message:not(:first-child) {
+  margin-top: 20px;
+}
+
+.user-message {
+  background-color: var(--user-message-color);
+}
+
+.computer-message {
+  background-color: var(--computer-message-color);
+  color: white;
 }
 
 .chat-footer {
   display: flex;
   align-items: center;
+  margin-top: 20px;
 }
 
 .chat-footer-input {

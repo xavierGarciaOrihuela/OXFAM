@@ -11,7 +11,7 @@ export const SidebarData = [
     {
         title: 'Documents',
         path: '/documents',
-        icon: <BsIcons.BsFileEarmarkPdf/>,
+        icon: <BsIcons.BsFiles/>,
     },
     {
         title: 'Chat',

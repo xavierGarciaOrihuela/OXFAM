@@ -9,6 +9,68 @@ const filesFolderPath = __dirname + "/documents/";
 var app = express();
 
 app.use(cors());
+
+/*-----*/
+const db = mysql.createConnection({
+  host: 'tu_host_de_mysql',
+  user: 'tu_usuario',
+  password: 'tu_contraseña',
+  database: 'tu_base_de_datos',
+});
+
+db.connect((err) => {
+  if (err) {
+    console.error('Error connecting to MySQL:', err);
+  } else {
+    console.log('Connected to MySQL!');
+  }
+});
+
+// JWT Secret Key (se recomienda almacenar en variables de entorno)
+const secretKey = 'tu_clave_secreta';
+
+// Middleware para verificar el token
+function verifyToken(req, res, next) {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(403).send('Token not provided');
+  }
+
+  jwt.verify(token, secretKey, (err, decoded) => {
+    if (err) {
+      return res.status(401).send('Invalid token');
+    }
+    req.user = decoded;
+    next();
+  });
+}
+
+// Nuevo endpoint para el inicio de sesión
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+
+  // Aquí deberías realizar la autenticación con la base de datos
+  // Consulta SQL para verificar el usuario y contraseña
+
+  const user = {
+    username,
+    // Otros datos del usuario que quieras incluir en el token
+  };
+
+  // Generar el token
+  jwt.sign({ user }, secretKey, { expiresIn: '1h' }, (err, token) => {
+    if (err) {
+      return res.status(500).json({ error: 'Error generating token' });
+    }
+    res.json({ token });
+  });
+});
+
+// Proteger rutas con el middleware verifyToken
+app.get('/secure-route', verifyToken, (req, res) => {
+  res.json({ message: 'This is a secure route' });
+});
+/*-----*/
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, filesFolderPath); // La carpeta ha d'existir
@@ -87,6 +149,8 @@ app.get('/general_chat', async (req, res) => {
   let sources = ['Grup PAE OXFAM', 'Temp Source', 'Informe 1', 'Informe 2', 'Lorem ipsum.pdf'];
   return res.status(200).json({'question': question, 'answer': answer, 'sources': sources});
 });
+
+
 
 
 

@@ -194,7 +194,7 @@ body {
 
 .message {
   border-radius: var(--rectuangular-border-radius);
-  display: block;
+  display: flex;
   padding: 20px;
 }
 
@@ -211,6 +211,17 @@ body {
   color: white;
 }
 
+.message-content {
+  flex: 1;
+  align-self: center;
+  word-break: break-all;
+}
+
+.message-icon {
+  font-size: 2em;
+  margin-right: 20px;
+}
+
 .chat-footer {
   display: flex;
   align-items: center;
@@ -225,6 +236,7 @@ body {
   height: var(--chat-footer-element-height);
   padding: 20px;
   margin-right: 10px;
+  box-shadow: var(--box-shadow);
 }
 
 .chat-footer-button {

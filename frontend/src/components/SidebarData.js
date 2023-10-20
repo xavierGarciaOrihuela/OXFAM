@@ -1,6 +1,6 @@
 import * as AiIcons from 'react-icons/ai';
 import * as BsIcons from 'react-icons/bs';
-import * as PiIcons from 'react-icons/pi'
+import * as PiIcons from 'react-icons/pi';
 
 export const SidebarData = [
     {

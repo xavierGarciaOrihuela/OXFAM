@@ -28,7 +28,7 @@ function ChatPage () {
             addNewMessage(sentQuestion, 'User', []);
             axios.get(`${backendURL}/general_chat?question=${sentQuestion}`).then((response) => {
                 addNewMessage(response.data.answer, 'Computer', response.data.sources);
-            }).catch((error) => setMessage(error));
+            }).catch((error) => setMessage("Something went wrong. Try again later"));
         } else {
             setMessage('You must provide a question')
         }

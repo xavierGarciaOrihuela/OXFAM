@@ -2,6 +2,7 @@ var express = require('express');
 var multer = require('multer');
 var cors = require('cors');
 const fs = require('fs');
+const axios = require('axios');
 
 
 const filesFolderPath = __dirname + "/documents/";
@@ -83,9 +84,25 @@ app.get('/general_chat', async (req, res) => {
   let question = req.query.question;
   if(question === undefined) return res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
   if(question === '') return res.status(400).send('The question parameter is empty.');
-  let answer = 'Això és una resposta temporal';
-  let sources = ['Grup PAE OXFAM', 'Temp Source', 'Informe 1', 'Informe 2', 'Lorem ipsum.pdf'];
-  return res.status(200).json({'question': question, 'answer': answer, 'sources': sources});
+  const flaskApiUrl = 'http://127.0.0.1:5000/api/ask';
+
+  try {
+    // Make a POST request to the Flask API
+    const response = await axios.post(flaskApiUrl, { question });
+    
+
+    // Handle the Flask API response
+    const { source_file_path, answer } = response.data;
+    console.log(source_file_path)
+    console.log(answer)
+    console.log(question)
+    let source = [source_file_path]
+    return res.status(200).json({'question': question, 'answer': answer, 'sources': source});
+  } catch (error) {
+    console.error('Error making POST request:', error);
+    return res.status(500).send('Error making POST request to Flask API');
+  }
+  
 });
 
 

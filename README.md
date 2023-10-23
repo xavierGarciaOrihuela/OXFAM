@@ -83,3 +83,19 @@ Start the server
 ```bash
   npm start
 ```
+
+Go to the IA/chatgpt-retrieval directory and create a constants.py file with the OPENAI_API_KEY
+
+```bash
+  cd ..
+  cd IA/chatgpt-retrieval
+  pip install -r requirements.txt
+  touch constants.py
+  echo APIKEY = "<your-api-key>" >> constants.py
+```
+
+Start the Flask server
+
+```bash
+  python chatgpt.py
+```

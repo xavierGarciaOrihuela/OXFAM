@@ -28,7 +28,7 @@ function ChatPage () {
             addNewMessage(sentQuestion, 'User', []);
             axios.get(`${backendURL}/general_chat?question=${sentQuestion}`).then((response) => {
                 addNewMessage(response.data.answer, 'Computer', response.data.sources);
-            }).catch((error) => setMessage(error));
+            }).catch((error) => setMessage("Something went wrong. Try again later"));
         } else {
             setMessage('You must provide a question')
         }
@@ -44,7 +44,7 @@ function ChatPage () {
                     );
                 })}
             </div>
-            <p>{message}</p>
+            <p style={{color: 'red'}}>{message}</p>
             <div className="chat-footer">
                 <input className="chat-footer-input" type="text" placeholder="Ask anything..." value={question} onChange={(e) => setQuestion(e.target.value)}></input>
                 <button className="chat-footer-button" onClick={handleAskSubmit}><PiIcons.PiPaperPlaneTilt />Ask</button>

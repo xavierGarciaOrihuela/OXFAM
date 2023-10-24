@@ -1,41 +1,30 @@
 import './App.css';
-
-import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import {BrowserRouter, Routes, Route } from "react-router-dom";
 import Navbar from './components/Navbar';
 import DocumentsSection from './components/DocumentsSection';
 import DocumentPage from './components/DocumentPage';
 import ChatPage from './components/ChatPage';
-import Login from './components/Login'
+import Login from './Login';
+import Register from './Register'
+import { Navigate } from 'react-router-dom';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [username, setUsername] = useState('');
-
-  const handleLogin = (user) => {
-    setLoggedIn(true);
-    setUsername(user);
-  };
-
   return (
     <BrowserRouter>
       <Routes>
-        {loggedIn ? (
-          <>
-            <Route path='/' element={<Navbar />}>
-              <Route path='documents' element={<DocumentsSection />} />
-              <Route path='documents/:name' element={<DocumentPage />} />
-              <Route path='chat' element={<ChatPage />} />
-            </Route>
-            <Route path='*' element={<Navigate to="/documents" />} />
-          </>
-        ) : (
-          <Route path='/' element={<Login onLogin={handleLogin} />} />
-        )}
+      <Route path="/" element={<Navigate to="/login" />}/>
+      <Route path='/register' element={<Register/>}/>
+      <Route path='/login' element={<Login/>}/>
+      <Route path='/home' element={<Navbar/>}>
+        <Route path='/home/documents' element={<DocumentsSection />} />
+        <Route path='/home/documents/:name' element={<DocumentPage />}/>
+        <Route path='/home/chat' element={<ChatPage />} />
+      </Route>
       </Routes>
+
     </BrowserRouter>
   );
 }
 
-export default App;
 
+export default App;

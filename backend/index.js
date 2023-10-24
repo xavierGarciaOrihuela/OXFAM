@@ -3,74 +3,24 @@ var multer = require('multer');
 var cors = require('cors');
 const fs = require('fs');
 const axios = require('axios');
+const bcrypt = require('bcrypt')
+const { Pool } = require('pg')
+const Joi = require('joi');
 
+
+const pool = new Pool({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'OXFAM',
+  password: 'PAE',
+  port: 5432,
+})
 
 const filesFolderPath = __dirname + "/documents/";
 
 var app = express();
 
 app.use(cors());
-
-/*-----*/
-const db = mysql.createConnection({
-  host: 'tu_host_de_mysql',
-  user: 'tu_usuario',
-  password: 'tu_contraseña',
-  database: 'tu_base_de_datos',
-});
-
-db.connect((err) => {
-  if (err) {
-    console.error('Error connecting to MySQL:', err);
-  } else {
-    console.log('Connected to MySQL!');
-  }
-});
-
-// JWT Secret Key (se recomienda almacenar en variables de entorno)
-const secretKey = 'tu_clave_secreta';
-
-// Middleware para verificar el token
-function verifyToken(req, res, next) {
-  const token = req.headers['authorization'];
-  if (!token) {
-    return res.status(403).send('Token not provided');
-  }
-
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).send('Invalid token');
-    }
-    req.user = decoded;
-    next();
-  });
-}
-
-// Nuevo endpoint para el inicio de sesión
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-
-  // Aquí deberías realizar la autenticación con la base de datos
-  // Consulta SQL para verificar el usuario y contraseña
-
-  const user = {
-    username,
-    // Otros datos del usuario que quieras incluir en el token
-  };
-
-  // Generar el token
-  jwt.sign({ user }, secretKey, { expiresIn: '1h' }, (err, token) => {
-    if (err) {
-      return res.status(500).json({ error: 'Error generating token' });
-    }
-    res.json({ token });
-  });
-});
-
-// Proteger rutas con el middleware verifyToken
-app.get('/secure-route', verifyToken, (req, res) => {
-  res.json({ message: 'This is a secure route' });
-});
 /*-----*/
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -165,6 +115,120 @@ app.get('/general_chat', async (req, res) => {
     return res.status(500).send('Error making POST request to Flask API');
   }
   
+});
+
+app.use(express.json())
+const replaceSpecialChars = (text) => { //evitar inyecciones sql
+  return text.replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+}
+
+const checkValues = (valueToCheck) => { //Comprobación parámetros entrada
+  return replaceSpecialChars(valueToCheck)
+}
+
+const usernameSchema = Joi.string().alphanum().min(3).max(30).required().messages({
+  'string.alphanum': `"username" must only contain alphanumuerical caracters`,
+  'string.min': `"username" must have a minimum length of {#limit}`,
+  'string.max': `"username" must have a maximum length of {#limit}`,
+  'string.empty': `"username" must not be empty`,
+  'any.required': `"username" is a required field`,
+});
+
+const passwordSchema = Joi.string().min(4).max(64).pattern(/(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])/).required().messages({
+  'string.empty': `"password" must not be empty`,
+  'string.required': `"password" is required`,
+  'string.min': `"password" must have a minimum length of {#limit}`,
+  'string.max': `"password" must have a maximum length of {#limit}`,
+  'string.pattern.base': `"password" must have at least one digit, one lower case and one upper case characters`,
+});
+
+const UserSchema = Joi.object({
+  username: usernameSchema,
+  password: passwordSchema,
+});
+
+app.post('/login', async (req, res) => {
+  const {username, password} = req.body;
+  try {
+
+    const { error, value } = UserSchema.validate(req.body, {abortEarly : false});
+    if (error) {
+        return res.status(400).json({
+        status: "error", 
+        type: "validation-error",
+        title: "Could not validate request paramteters", 
+        message: "Username or password are not correct. Please try again."});
+    }
+
+    const cleanUsername = checkValues(value.username)
+    const cleanPassword = checkValues(value.password)
+
+    const query = {
+      text: 'SELECT * FROM users WHERE username = $1',
+      values: [cleanUsername]
+    }
+    const user = await pool.query(query)
+
+    if (!user.rows[0]) {
+      res.status(404).json({
+        status: "error",
+        message: "User specified doesn't exist. Please try again" })
+      return;
+    }
+    const checkPassword = await bcrypt.compare(cleanPassword, user.rows[0].password)
+    if (checkPassword) res.send('OK')
+    else res.status(401).json ({
+        status: "error",
+        message: "Incorrect password. Please try again" })
+      return;
+  }
+catch(error) {
+  res.status(500).json({
+      statsu: "error",
+      message:'Error at logging in. Please try again.'})
+}
+});
+
+
+app.post('/register', async (req, res) => {
+
+  try {
+    const { error, value } = UserSchema.validate(req.body, {abortEarly : false});
+    if (error) {
+        console.error("Error: ", error)
+        return res.status(400).json({
+            status: "error", 
+            type: "validation-error",
+            message: "Could not validate request paramteters"})
+    }
+
+    const cleanUsername = checkValues(value.username)
+    //const cleanPassword = checkValues(value.password)
+
+    const hashedPassword = await bcrypt.hash(value.password, 10)
+    try {
+      query = {
+        text: 'INSERT INTO users(username, password) VALUES($1, $2)',
+        values: [cleanUsername, hashedPassword]
+      }
+      await pool.query(query)
+    }
+    catch(error) {
+      res.status(409).send("User with given username already exists");
+      return;
+    }
+    
+    res.status(200).send('OK')
+    //pool.release(); 
+  }
+  catch(error) {
+    console.error('Error at registring new user');
+    res.status(500).send('Error at registring new user. Please try again');
+  }
 });
 
 

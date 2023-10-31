@@ -183,8 +183,26 @@ body {
   cursor: pointer;
 }
 
+.document-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.document-main{
+  flex: 1;
+  display: flex;
+  overflow-y: scroll;
+}
+
 .document-viewer {
   flex: 1;
+}
+
+.single-document-chat {
+  width: 30%;
+  margin-left: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .chat-container {

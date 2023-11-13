@@ -58,7 +58,21 @@ app.post('/documents', upload.single('File'), function (req, res) {
         return res.status(400).send('No file was sent.');
     }
 
-    res.json({'message': `${file.originalname} successfully uploaded.`})
+    const filename = file.originalname;
+
+    const aux = "pae";
+    const date = new Date();
+    // Insertar en la base de datos
+    const query = 'INSERT INTO Documentos (nombre_documento, autor_documento, fecha_documento, id_chatpdf, permisos_documento) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    console.log(query)
+    pool.query(query, [filename, aux, date, 1, "publico"], (error, result) => {
+        if (error) {
+            console.error('Error al insertar en la base de datos:', error);
+            return res.status(500).send('Error interno del servidor');
+        }
+        console.log("TODO OK");
+        //res.json({'message': ${filename} successfully uploaded.});
+    });
 })
 
 // Endpoint per obtenir un fitxer donat el nom
@@ -72,6 +86,8 @@ app.get('/documents/:fileName', function (req, res) {
             res.status(404).send('File not found.');
         }
     });
+
+    
 });
 
 // Endpoint per eliminar un fitxer donat el nom
@@ -195,7 +211,7 @@ catch(error) {
 
 
 app.post('/register', async (req, res) => {
-
+  const {username, password} = req.body;
   try {
     const { error, value } = UserSchema.validate(req.body, {abortEarly : false});
     if (error) {
@@ -208,12 +224,12 @@ app.post('/register', async (req, res) => {
 
     const cleanUsername = checkValues(value.username)
     //const cleanPassword = checkValues(value.password)
-
+    console.log('OK');
     const hashedPassword = await bcrypt.hash(value.password, 10)
     try {
       query = {
-        text: 'INSERT INTO users(username, password) VALUES($1, $2)',
-        values: [cleanUsername, hashedPassword]
+        text: 'INSERT INTO users(username, password, permisos_usuario) VALUES($1, $2, $3)',
+        values: [cleanUsername, hashedPassword, "privado"]
       }
       await pool.query(query)
     }

@@ -1,4 +1,5 @@
-// src/Login.js
+// src/Register.js
+import './App.css';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'
@@ -12,33 +13,38 @@ const Register = () => {
     // Aquí puedes agregar la lógica de autenticación
     try {
       const response = await axios.post('http://localhost:3001/register', {
-          username,
-          password,
-        });
-        if (response.data === 'OK') {
-          navigate('/')
-        }
+        username,
+        password,
+      });
+    
+      if (response.data === 'OK') {
+        navigate('/home');
+      } else {
+        // Handle other cases, maybe show an error message to the user
+        console.error('Registration failed:', response.data);
       }
-      catch(error) {}
-    //console.log(`Usuario: ${username}, Contraseña: ${password}`);
+    } catch (error) {
+      // Handle the error, log it, or show an error message to the user
+      console.error('Error during registration:', error);
+    }
   };
 
   return (
-    <div>
-      <h2>Iniciar sesión</h2>
-      <input
+    <div className='login-container'>
+      <h2 className='login-title'>Registrarse</h2>
+      <input className='login-input'
         type="text"
         placeholder="Usuario"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
       />
-      <input
+      <input className='login-input'
         type="password"
         placeholder="Contraseña"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <button onClick={handleRegister}>Registrarse</button>
+      <button className='login-button' onClick={handleRegister}>Registrarse</button>
     </div>
   );
 };

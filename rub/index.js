@@ -20,8 +20,7 @@ const filesFolderPath = __dirname + "/documents/";
 
 const app = express();
 app.use(cookieParser());
-//app.use(cors());
-app.use(cors({ credentials: true, origin: 'http://localhost:3000' }));
+app.use(cors());
 /*-----*/
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -39,50 +38,20 @@ app.get('/', function (req, res) {
 });
 
 // Endpoint per obtenir tots els noms dels documents guardats
-app.get('/documents', async (req, res) => {
-    const token = req.cookies['access_token'];
-    console.log('token: ' + token);
-    /*fs.readdir(filesFolderPath, (err, files) => {
+app.get('/documents', function (req, res) {
+    fs.readdir(filesFolderPath, (err, files) => {
         if (err) {
           return res.status(500).json({ error: 'Error reading files folder' });
         }
 
         const filenames = files.map((file) => ({ name: file }));
         res.status(200).json(filenames);
-    });*/
-    let query = null;
-    let filenames = [];
-    if (token.type == 'private') {
-      query = {
-        text: 'SELECT nombre, autor, fecha, type FROM documentos'
-      }
-      const docs = await pool.query(query);
-      console.log('docs out '+ docs.rows[0].nombre);
-      docs.rows.forEach((document) => {
-        nombre = document.nombre; 
-        filenames.push({ name: nombre });
-      });
-    
-      console.log('Resultados mapeados:', filenames);    
-    }
-    else {
-      query = {
-        text: 'SELECT nombre, autor, fecha, type FROM documentos WHERE type = $1',
-        values: [token.type]
-      }   
-      const docs = await pool.query(query);
-      docs.rows.forEach((document) => {
-        nombre = document.nombre; 
-        filenames.push({ name: nombre });
-      });
-    }
-    res.status(200).json(filenames);
+    });
 });
 
 //Endpoint per afegir un nou document, cal que la request compti amb un formdata que contingui un únic fitxer que es digui 'File'
 // We can change to accept multiple files: upload.single() -> upload.array()
 app.post('/documents', upload.single('File'), function (req, res) {
-    const token = req.cookies['access_token'];
     // Accede al archivo a través de req.file
     const file = req.file;
     if (!file) {
@@ -90,7 +59,8 @@ app.post('/documents', upload.single('File'), function (req, res) {
     }
     //-------
     console.log(req.cookies)
-   
+    
+    //res.send(req.cookies);
     //-----
     const filename = file.originalname;
 
@@ -99,7 +69,7 @@ app.post('/documents', upload.single('File'), function (req, res) {
     // Insertar en la base de datos
     const query = 'INSERT INTO Documentos (nombre, autor, fecha, type) VALUES ($1, $2, $3, $4) RETURNING *';
     console.log(query)
-    pool.query(query, [filename, token.username, date, token.type], (error, result) => {
+    pool.query(query, [filename, aux, date, "public"], (error, result) => {
         if (error) {
             console.error('Error al insertar en la base de datos:', error);
             return res.status(500).send('Error interno del servidor');
@@ -143,9 +113,6 @@ app.delete('/documents/:fileName', async (req, res) => {
 // Endpoint per obtenir una resposta a una pregunta per al chat general
 // Cal afegir un query parameter al endpoint per a que funcioni: http://localhost:3001/general_chat?question=Test
 app.get('/general_chat', async (req, res) => {
-  const token = req.cookies['access_token'];
-  console.log(token);
-  //-----------------
   let question = req.query.question;
   if(question === undefined) return res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
   if(question === '') return res.status(400).send('The question parameter is empty.');
@@ -227,12 +194,8 @@ app.post('/login', async (req, res) => {
     }
     const user = await pool.query(query)
     if (user.rows[0] && user.rows[0].password == cleanPassword) {
-      const user_info = {
-        username: user.rows[0].username,
-        type: user.rows[0].type,
-      };
-      console.log('user_info: '+user_info);
-      res.cookie('access_token', user_info, { maxAge: 86400000, httpOnly: true, sameSite: 'None', secure: true });
+      console.log('id del user: ' + user.rows[0].id);
+      res.cookie(`pae cookie`, user.rows[0].id, {expires: 60*60, httpOnly: true});
       res.status(200).send('OK');
     }
     else {
@@ -293,15 +256,7 @@ app.post('/register', async (req, res) => {
   }
 });
 
-app.get('/proba', async (req, res) => {
-  const token = req.cookies['access_token'];
-  console.log(token);
-  res.send(token)
-});
 
 app.listen(3001, function () {
     console.log('Listening on the port 3001!');
 });
-
-
-

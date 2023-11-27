@@ -15,9 +15,12 @@ const Login = () => {
     // Aquí puedes agregar la lógica de autenticación
     try {
       const response = await axios.post('http://localhost:3001/login', {
-          username,
-          password,
-        });
+        username,
+        password,
+      }, {
+        withCredentials: true,
+      });
+
         console.log("Username " + username)
         if (response.data.status === 'error') {
           const errorMessage = response.data.message;
@@ -38,7 +41,7 @@ const Login = () => {
           }
         }
       }
-    //console.log(`Usuario: ${username}, Contraseña: ${password}`);
+    
 
   return (
     

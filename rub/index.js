@@ -68,7 +68,6 @@ app.post('/documents', upload.single('File'), function (req, res) {
     const date = new Date();
     // Insertar en la base de datos
     const query = 'INSERT INTO Documentos (nombre, autor, fecha, type) VALUES ($1, $2, $3, $4) RETURNING *';
-    console.log(query)
     pool.query(query, [filename, aux, date, "public"], (error, result) => {
         if (error) {
             console.error('Error al insertar en la base de datos:', error);
@@ -194,7 +193,6 @@ app.post('/login', async (req, res) => {
     }
     const user = await pool.query(query)
     if (user.rows[0] && user.rows[0].password == cleanPassword) {
-      console.log('id del user: ' + user.rows[0].id);
       res.cookie(`pae cookie`, user.rows[0].id, {expires: 60*60, httpOnly: true});
       res.status(200).send('OK');
     }
@@ -233,7 +231,6 @@ app.post('/register', async (req, res) => {
 
     const cleanUsername = checkValues(value.username)
     //const cleanPassword = checkValues(value.password)
-    console.log('OK');
     const hashedPassword = await bcrypt.hash(value.password, 10)
     try {
       query = {

@@ -21,7 +21,6 @@ const Login = () => {
         withCredentials: true,
       });
 
-        console.log("Username " + username)
         if (response.data.status === 'error') {
           const errorMessage = response.data.message;
           setErrorMessage(errorMessage)

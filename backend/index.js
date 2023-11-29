@@ -41,41 +41,33 @@ app.get('/', function (req, res) {
 // Endpoint per obtenir tots els noms dels documents guardats
 app.get('/documents', async (req, res) => {
     const token = req.cookies['access_token'];
-    console.log('token: ' + token.username);
-    /*fs.readdir(filesFolderPath, (err, files) => {
-        if (err) {
-          return res.status(500).json({ error: 'Error reading files folder' });
-        }
-
-        const filenames = files.map((file) => ({ name: file }));
-        res.status(200).json(filenames);
-    });*/
     let query = null;
     let filenames = [];
-    if (token.type == 'private') {
-      query = {
-        text: 'SELECT nombre, autor, fecha, type FROM documentos'
+      if (token.type == 'private') {
+        query = {
+          text: 'SELECT nombre, autor, fecha, type FROM documentos'
+        }
+        const docs = await pool.query(query);
+        if (docs.rowCount > 0) {
+          docs.rows.forEach((document) => {
+            filenames.push({name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username });
+          });
+        
+        }  
       }
-      const docs = await pool.query(query);
-      console.log('docs out '+ docs.rows[0].nombre);
-      docs.rows.forEach((document) => {
-        //nombre = document.nombre; 
-        filenames.push({name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username });
-      });
-    
-      console.log('Resultados mapeados:', filenames);    
-    }
-    else {
-      query = {
-        text: 'SELECT nombre, autor, fecha, type FROM documentos WHERE type = $1',
-        values: [token.type]
-      }   
-      const docs = await pool.query(query);
-      docs.rows.forEach((document) => {
-        //nombre = document.nombre; 
-        filenames.push({ name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username});
-      });
-    }
+      else {
+        query = {
+          text: 'SELECT nombre, autor, fecha, type FROM documentos WHERE type = $1',
+          values: [token.type]
+        }   
+        const docs = await pool.query(query);
+        if (docs.rowCount >= 0) {
+          docs.rows.forEach((document) => {
+            //nombre = document.nombre; 
+            filenames.push({ name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username});
+          });
+        }
+      }
     res.status(200).json(filenames);
 });
 
@@ -88,24 +80,19 @@ app.post('/documents', upload.single('File'), function (req, res) {
     if (!file) {
         return res.status(400).send('No file was sent.');
     }
-    //-------
-    console.log(req.cookies)
-   
     //-----
     const filename = file.originalname;
 
     const aux = "pae";
     const date = new Date();
+
     // Insertar en la base de datos
     const query = 'INSERT INTO Documentos (nombre, autor, fecha, type) VALUES ($1, $2, $3, $4) RETURNING *';
-    console.log(query)
     pool.query(query, [filename, token.username, date, token.type], (error, result) => {
         if (error) {
             console.error('Error al insertar en la base de datos:', error);
             return res.status(500).send('Error interno del servidor');
         }
-        console.log("TODO OK");
-        //res.json({'message': ${filename} successfully uploaded.});
     });
 })
 
@@ -146,7 +133,6 @@ app.delete('/documents/:fileName', async (req, res) => {
 // Cal afegir un query parameter al endpoint per a que funcioni: http://localhost:3001/general_chat?question=Test
 app.get('/general_chat', async (req, res) => {
   const token = req.cookies['access_token'];
-  console.log(token);
   //-----------------
   let question = req.query.question;
   if(question === undefined) return res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
@@ -160,9 +146,6 @@ app.get('/general_chat', async (req, res) => {
 
     // Handle the Flask API response
     const { source_file_path, answer } = response.data;
-    console.log(source_file_path)
-    console.log(answer)
-    console.log(question)
     let source = [source_file_path]
     return res.status(200).json({'question': question, 'answer': answer, 'sources': source});
   } catch (error) {
@@ -233,7 +216,7 @@ app.post('/login', async (req, res) => {
         username: user.rows[0].username,
         type: user.rows[0].type,
       };
-      console.log('user_info: '+user_info);
+      //console.log('user_info: '+user_info);
       res.cookie('access_token', user_info, { maxAge: 86400000, httpOnly: true, sameSite: 'None', secure: true });
       res.status(200).send('OK');
     }
@@ -272,7 +255,6 @@ app.post('/register', async (req, res) => {
 
     const cleanUsername = checkValues(value.username)
     //const cleanPassword = checkValues(value.password)
-    console.log('OK');
     const hashedPassword = await bcrypt.hash(value.password, 10)
     try {
       query = {
@@ -293,12 +275,6 @@ app.post('/register', async (req, res) => {
     console.error('Error at registring new user');
     res.status(500).send('Error at registring new user. Please try again');
   }
-});
-
-app.get('/proba', async (req, res) => {
-  const token = req.cookies['access_token'];
-  console.log(token);
-  res.send(token)
 });
 
 app.listen(3001, function () {

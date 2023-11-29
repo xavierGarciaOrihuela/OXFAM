@@ -41,7 +41,7 @@ app.get('/', function (req, res) {
 // Endpoint per obtenir tots els noms dels documents guardats
 app.get('/documents', async (req, res) => {
     const token = req.cookies['access_token'];
-    console.log('token: ' + token);
+    console.log('token: ' + token.username);
     /*fs.readdir(filesFolderPath, (err, files) => {
         if (err) {
           return res.status(500).json({ error: 'Error reading files folder' });
@@ -59,8 +59,8 @@ app.get('/documents', async (req, res) => {
       const docs = await pool.query(query);
       console.log('docs out '+ docs.rows[0].nombre);
       docs.rows.forEach((document) => {
-        nombre = document.nombre; 
-        filenames.push({ name: nombre });
+        //nombre = document.nombre; 
+        filenames.push({name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username });
       });
     
       console.log('Resultados mapeados:', filenames);    
@@ -72,8 +72,8 @@ app.get('/documents', async (req, res) => {
       }   
       const docs = await pool.query(query);
       docs.rows.forEach((document) => {
-        nombre = document.nombre; 
-        filenames.push({ name: nombre });
+        //nombre = document.nombre; 
+        filenames.push({ name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username});
       });
     }
     res.status(200).json(filenames);
@@ -132,6 +132,8 @@ app.delete('/documents/:fileName', async (req, res) => {
     try {
       // Utilitzem fs.promises.unlink per eliminar el fitxer
       await fs.promises.unlink(filePath);
+      const query = 'DELETE FROM documentos WHERE nombre = $1';
+      await pool.query(query, [fileName]);
       res.status(204);
     } catch (error) {
       // Gestionem els errors, per exemple, si no es troba el fitxer

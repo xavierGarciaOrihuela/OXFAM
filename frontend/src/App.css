@@ -109,15 +109,28 @@ body {
 }
 
 .documents-list-item {
-  display: block;
+  display: flex;
+  justify-content: space-between; /* Añadido para espaciar elementos horizontalmente */
+  align-items: center;
   height: 70px;
   border-radius: var(--rectuangular-border-radius);
   background-color: var(--documents-list-item-color);
   margin-top: 20px;
+  margin-right: 20px;
   box-shadow: var(--box-shadow);
+  padding: 0 20px;
+}
+
+.documents-list-item-info {
   display: flex;
-  align-items: center;
-  padding: 0 30px;
+  flex-direction: row; /* Cambiado de column a row */
+  align-items: flex-start;
+  margin-left: 10px;
+}
+
+.document-author,
+.document-date {
+  margin-right: 350px; /* Ajusta el margen derecho según tus necesidades */
 }
 
 .documents-list-item-link {

@@ -47,5 +47,5 @@ body {
 }
 
 .login-button:hover {
-  background-color: darken(var(--blue-color), 10%);
+  background-color: rgb(54, 54, 202);
 }

@@ -13,7 +13,7 @@ function DocumentsListItem({ name, author, date, type, activeuser, callback }) {
 
   return (
     <div className="documents-list-item">
-      <Link to={`/documents/${name}`} className="documents-list-item-link">
+      <Link to={`/home/documents/${name}`} className="documents-list-item-link">
         <p>{name}</p>
       </Link>
       <div className="documents-list-item-info">

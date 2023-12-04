@@ -5,17 +5,17 @@ import * as PiIcons from 'react-icons/pi';
 export const SidebarData = [
     {
         title: 'Home',
-        path: '/',
+        path: '/home',
         icon: <AiIcons.AiOutlineHome />,
     },
     {
         title: 'Documents',
-        path: '/documents',
+        path: '/home/documents',
         icon: <BsIcons.BsFiles/>,
     },
     {
         title: 'Chat',
-        path: '/chat',
+        path: '/home/chat',
         icon: <PiIcons.PiChatsCircle />,
     }
 ]

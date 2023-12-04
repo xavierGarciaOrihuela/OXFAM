@@ -14,7 +14,7 @@ function DocumentsSection() {
     const [message, SetMessage] = useState("");
 
     function getDocuments () {
-        axios.get(`${backendURL}/documents`).then((response) => {
+        axios.get(`${backendURL}/documents`, {withCredentials: true}).then((response) => {
             SetDocuments(response.data);
             SetDisplayedDocuments(response.data);
             SetSearchInput("");
@@ -39,7 +39,7 @@ function DocumentsSection() {
     function handleFileSelection (file) {
         let formData = new FormData();
         formData.append("File", file);
-        axios.post(`${backendURL}/documents`, formData).then((response) => {
+        axios.post(`${backendURL}/documents`, formData, {withCredentials: true}).then((response) => {
             SetMessage("File uploaded successfully!");
         });
 
@@ -71,7 +71,7 @@ function DocumentsSection() {
             <div className="documents-list">
                 {displayedDocuments.map((item, index) => {
                     return (
-                        <DocumentsListItem name={item.name} callback={handleDeleteDocument}></DocumentsListItem>
+                        <DocumentsListItem name={item.name} author={item.author} date={item.date} type= {item.type} activeuser = {item.activeuser} callback={handleDeleteDocument}></DocumentsListItem>
                     );
                 })}
             </div>

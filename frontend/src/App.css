@@ -315,3 +315,10 @@ body {
   font-size: 1.1em;
   cursor: pointer;
 }
+
+.individual-chat {
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}

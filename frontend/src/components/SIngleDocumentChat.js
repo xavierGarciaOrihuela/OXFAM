@@ -32,7 +32,7 @@ function SingleDocumentChat ({fileName}) {
     };
 
     return (
-        <>
+        <div className="individual-chat">
             <div className="chat-container">
                 {messages.map((message, index) => {
                     return (
@@ -45,7 +45,7 @@ function SingleDocumentChat ({fileName}) {
                 <input className="chat-footer-input" type="text" placeholder="Ask anything..." value={question} onChange={(e) => setQuestion(e.target.value)}></input>
                 <button className="chat-footer-button" onClick={handleAskSubmit}><PiIcons.PiPaperPlaneTilt />Ask</button>
             </div>
-        </>
+        </div>
     );
 };
 

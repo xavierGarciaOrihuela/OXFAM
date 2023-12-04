@@ -27,7 +27,8 @@ const Login = () => {
         }
 
         if (response.data === 'OK') {
-          navigate('/home')
+          localStorage.setItem('currentUser', JSON.stringify(username));
+          navigate('/home/')
         }
       }
       catch(error) {

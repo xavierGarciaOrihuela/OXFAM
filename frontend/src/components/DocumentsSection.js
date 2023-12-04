@@ -41,9 +41,8 @@ function DocumentsSection() {
         formData.append("File", file);
         axios.post(`${backendURL}/documents`, formData, {withCredentials: true}).then((response) => {
             SetMessage("File uploaded successfully!");
+            getDocuments();
         });
-
-        getDocuments();
     };
 
     useEffect(() => {

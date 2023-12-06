@@ -5,7 +5,7 @@ import * as PiIcons from 'react-icons/pi';
 export const SidebarData = [
     {
         title: 'Home',
-        path: '/home',
+        path: '/home/',
         icon: <AiIcons.AiOutlineHome />,
     },
     {

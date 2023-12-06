@@ -94,6 +94,7 @@ app.post('/documents', upload.single('File'), function (req, res) {
             return res.status(500).send('Error interno del servidor');
         }
     });
+    return res.status(201).json({'message': `${file.originalname} successfully uploaded.`});
 })
 
 // Endpoint per obtenir un fitxer donat el nom

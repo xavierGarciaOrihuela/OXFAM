@@ -4,7 +4,7 @@ import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import * as AiIcons from 'react-icons/ai';
 
-import ChatPage from "./ChatPage";
+import SingleDocumentChat from "./SIngleDocumentChat";
 
 import backendURL from "../global";
 
@@ -31,7 +31,7 @@ function DocumentPage () {
         <>
             <div className="document-header">
                 <div>
-                    <Link to={"/documents"}> Return to the documents list</Link>
+                    <Link to={"/home/documents"}> Return to the documents list</Link>
                     <p>{message}</p>
                     <h1>{name}</h1>
                 </div>
@@ -42,9 +42,7 @@ function DocumentPage () {
 
                 </object>
                 {activeChat ? 
-                <div className="single-document-chat">
-                <ChatPage />
-                </div>
+                < SingleDocumentChat />
                 :
                 <></>}
             </div>

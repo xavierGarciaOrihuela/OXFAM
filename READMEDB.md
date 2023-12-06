@@ -2,10 +2,21 @@ DB INSTALLATION
 Descargar la versión 16 de postgres
 https://www.enterprisedb.com/downloads/postgres-postgresql-downloads
 
+// En linux: 
+sudo apt-get -y install postgresql
+
+Ir a https://www.pgadmin.org/download/pgadmin-4-apt/ y seguir pasos
+
+Luego en la terminal
+
+sudo -u postgres psql
+ALTER USER postgres PASSWORD 'PAE';
+
 password: PAE
 Puerto: 5432
 
 Una vez descargado abrir pgAdmin 4 y crear una nueva base de datos "OXFAM"
+
 
 Arriba izquierda iniciamos BD e introducir la siguiente query:
 -- Tabla de usuarios

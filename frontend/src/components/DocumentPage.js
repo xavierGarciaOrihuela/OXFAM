@@ -2,6 +2,9 @@ import React from "react";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import axios from "axios";
+import * as AiIcons from 'react-icons/ai';
+
+import SingleDocumentChat from "./SIngleDocumentChat";
 
 import backendURL from "../global";
 
@@ -9,6 +12,7 @@ function DocumentPage () {
     const [documentURL, setDocumentURL] = useState();
     const [message, setMessage] = useState('');
     let { name } = useParams();
+    const [activeChat, setActiveChat] = useState(true);
 
     useEffect(() => {
         
@@ -25,14 +29,23 @@ function DocumentPage () {
 
     return (
         <>
-            <div>
-                <Link to={"/documents"}> Return to the documents list</Link>
-                <p>{message}</p>
-                <h1>{name}</h1>
+            <div className="document-header">
+                <div>
+                    <Link to={"/home/documents"}> Return to the documents list</Link>
+                    <p>{message}</p>
+                    <h1>{name}</h1>
+                </div>
+                <button onClick={() => setActiveChat(!activeChat)}>{activeChat ? <AiIcons.AiOutlineEyeInvisible /> : <AiIcons.AiOutlineEye />}{activeChat ? 'Close chat' : 'Open chat'}</button>
             </div>
-            <object className="document-viewer" data={documentURL} type="application/pdf">
+            <div className="document-main">
+                <object className="document-viewer" data={documentURL} type="application/pdf">
 
-            </object>
+                </object>
+                {activeChat ? 
+                < SingleDocumentChat />
+                :
+                <></>}
+            </div>
         </>
     );
 }

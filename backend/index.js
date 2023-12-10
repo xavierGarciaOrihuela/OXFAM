@@ -8,6 +8,7 @@ const { Pool } = require('pg')
 const Joi = require('joi');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const FormData = require("form-data");
 
 const pool = new Pool({
   user: 'postgres',
@@ -75,7 +76,7 @@ app.get('/documents', async (req, res) => {
 
 //Endpoint per afegir un nou document, cal que la request compti amb un formdata que contingui un únic fitxer que es digui 'File'
 // We can change to accept multiple files: upload.single() -> upload.array()
-app.post('/documents', upload.single('File'), function (req, res) {
+app.post('/documents', upload.single('File'), async function (req, res) {
     const token = req.cookies['access_token'];
     // Accede al archivo a través de req.file
     const file = req.file;
@@ -88,9 +89,35 @@ app.post('/documents', upload.single('File'), function (req, res) {
     const aux = "pae";
     const date = new Date();
 
+    // Pujem el document a ChatPDF i guardem el ID que retorna
+    let document_chatpdf_id = null;
+    if(chatPDF_api_key) {
+      const formData = new FormData();
+      formData.append("file", fs.createReadStream(filesFolderPath + file.originalname));
+
+      const options = {
+        headers: {
+          "x-api-key": chatPDF_api_key,
+          ...formData.getHeaders(),
+        },
+      };
+        
+      await axios.post("https://api.chatpdf.com/v1/sources/add-file", formData, options)
+      .then((response) => {
+        // Guardar ID en la base de datos
+        document_chatpdf_id = response.data.sourceId;
+        console.log("Chatpdf Document ID:", response.data.sourceId);
+      })
+      .catch((error) => {
+        console.log("Error when uploading to ChatPDF:", error);
+      });
+    } else {
+      console.log("NO api_key provided for ChatPDF");
+    }
+
     // Insertar en la base de datos
-    const query = 'INSERT INTO Documentos (nombre, autor, fecha, type) VALUES ($1, $2, $3, $4) RETURNING *';
-    pool.query(query, [filename, token.username, date, token.type], (error, result) => {
+    const query = 'INSERT INTO Documentos (nombre, autor, fecha, id_chatpdf, type) VALUES ($1, $2, $3, $4, $5) RETURNING *';
+    pool.query(query, [filename, token.username, date, document_chatpdf_id, token.type], (error, result) => {
         if (error) {
             console.error('Error al insertar en la base de datos:', error);
             return res.status(500).send('Error interno del servidor');
@@ -114,12 +141,39 @@ app.get('/documents/:fileName', function (req, res) {
     
 });
 
+async function getDocumentChatPDFid (documentName) {
+  const query = 'SELECT id_chatpdf FROM documentos WHERE nombre = $1';
+  const id = await pool.query(query, [documentName]);
+  return id.rows[0].id_chatpdf;
+};
+
 // Endpoint per eliminar un fitxer donat el nom
 app.delete('/documents/:fileName', async (req, res) => {
     const fileName = req.params.fileName;
     const filePath = filesFolderPath + fileName; // Make sure the path is correct
   
     try {
+      const chatpdfID = await getDocumentChatPDFid(fileName);
+      if(chatPDF_api_key && chatpdfID !== null) {
+        const config = {
+          headers: {
+            "x-api-key": chatPDF_api_key,
+            "Content-Type": "application/json",
+          },
+        };
+        // Obtenir primer el sourceId del document
+        const data = {
+          sources: [chatpdfID],
+        };
+
+        axios.post("https://api.chatpdf.com/v1/sources/delete", data, config)
+        .then((response) => {
+          console.log("Success in deleteing the document");
+        })
+        .catch((error) => {
+          
+        });
+      }
       // Utilitzem fs.promises.unlink per eliminar el fitxer
       await fs.promises.unlink(filePath);
       const query = 'DELETE FROM documentos WHERE nombre = $1';
@@ -130,6 +184,46 @@ app.delete('/documents/:fileName', async (req, res) => {
       console.error(`Error while trying to delete ${fileName}`, error);
       res.status(404).send('File not found');
     }
+});
+
+app.get('/individual_chat/:filename', async (req, res) => {
+  const fileName = req.params.filename;
+  const chatpdfID = await getDocumentChatPDFid(fileName);
+  if(chatPDF_api_key && chatpdfID != null){
+    let question = req.query.question;
+    if(question === undefined) res.status(400).send('The question parameter is missing. Example of the use of the endpoint: http://localhost:3001/general_chat?question=Test');
+    if(question === '') res.status(400).send('The question parameter is empty.');
+    // Obtenir el sourceId que li correspongui al document
+    const config = {
+      headers: {
+        'x-api-key': chatPDF_api_key,
+        'Content-Type': "application/json",
+      },
+    };
+
+    const data = {
+      'sourceId': chatpdfID,
+      'messages': [
+        {
+          'role': "user",
+          'content': question,
+        }
+      ]
+    };
+
+    axios.post("https://api.chatpdf.com/v1/chats/message", data, config)
+    .then((response) => {
+      res.status(200).json({'question': question, 'answer': response.data.content, 'sources': []})
+    })
+    .catch((error) => {
+      console.log(error.message);
+      console.log("Response:", error.response.data);
+      res.status(500).send(error.message);
+    });
+  } else {
+    console.log('Access to ChatPDF is closed')
+    res.status(200).json({'question': '', 'answer': 'ERROR: Access to ChatPDF is closed', 'sources': []})
+  }
 });
 
 // Endpoint per obtenir una resposta a una pregunta per al chat general

@@ -28,14 +28,14 @@ CREATE TABLE usuarios (
 );
 
 -- Tabla de documentos
-CREATE TABLE documentos (
-    id SERIAL PRIMARY KEY,
-    nombre VARCHAR(255) NOT NULL,
-    autor VARCHAR(255) NOT NULL,
-    fecha DATE NOT NULL,
-    id_chatpdf INTEGER, 
-    type VARCHAR(10) CHECK (type IN ('public', 'private'))
-);
+    CREATE TABLE documentos (
+        id SERIAL PRIMARY KEY,
+        nombre VARCHAR(255) NOT NULL,
+        autor VARCHAR(255) NOT NULL,
+        fecha DATE NOT NULL,
+        id_chatpdf VARCHAR(255), 
+        type VARCHAR(10) CHECK (type IN ('public', 'private'))
+    );
 INSERT INTO usuarios (username,password,type) VALUES ('PAE', 'P1A2E3-!','private');
 SELECT * FROM usuarios
 

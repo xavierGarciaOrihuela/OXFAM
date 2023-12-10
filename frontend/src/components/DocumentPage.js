@@ -42,7 +42,7 @@ function DocumentPage () {
 
                 </object>
                 {activeChat ? 
-                < SingleDocumentChat />
+                < SingleDocumentChat fileName={name}/>
                 :
                 <></>}
             </div>

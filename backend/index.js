@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt')
 const { Pool } = require('pg')
 const Joi = require('joi');
 const cookieParser = require('cookie-parser');
+require('dotenv').config();
 
 const pool = new Pool({
   user: 'postgres',
@@ -17,6 +18,7 @@ const pool = new Pool({
 })
 
 const filesFolderPath = __dirname + "/documents/";
+const chatPDF_api_key = process.env.CHATPDF_API_KEY;
 
 const app = express();
 app.use(cookieParser());

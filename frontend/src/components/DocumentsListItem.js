@@ -8,23 +8,30 @@ function formatDate(dateString) {
   return formattedDate;
 }
 
-function DocumentsListItem({ name, author, date, type, activeuser, callback }) {
+function DocumentsListItem({ name, author, date, type, can_delete, callback }) {
   const formattedDate = formatDate(date);
 
   return (
     <div className="documents-list-item">
-      <Link to={`/home/documents/${name}`} className="documents-list-item-link">
+      <Link to={`/home/documents/${name}`} className="documents-list-item-link documents-list-name">
         <p>{name}</p>
       </Link>
       <div className="documents-list-item-info">
-        <p className="document-author">{author}</p>
-        <p className="document-date">{formattedDate}</p>
+        <p className="documents-list-author">{author}</p>
+        <p className="documents-list-date">{formattedDate}</p>
+        {type !== '' ?
+        <p className="documents-list-type"><span className={type == 'public' ? "public-type" : "private-type"}>{type}</span> </p>
+        :
+        <></>
+        }
       </div>
-      {type === 'private' && activeuser === author && (
-        <div className="documents-list-item-delete-button" onClick={() => { callback(name) }}>
-          <AiIcons.AiOutlineDelete />
+      {can_delete ? (
+        <div className="documents-list-item-delete-button" >
+          <AiIcons.AiOutlineDelete onClick={() => { callback(name) }}/>
         </div>
-      )}
+      )
+      :
+      <></>}
     </div>
   );
 }

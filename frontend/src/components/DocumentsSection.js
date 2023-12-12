@@ -4,6 +4,7 @@ import axios from "axios";
 import * as AiIcons from 'react-icons/ai';
 
 import DocumentsListItem from "./DocumentsListItem";
+import NewFileForm from "./NewFIleForm";
 
 import backendURL from "../global";
 
@@ -12,6 +13,7 @@ function DocumentsSection() {
     const [displayedDocuments, SetDisplayedDocuments] = useState([]);
     const [searchInput, SetSearchInput] = useState("");
     const [message, SetMessage] = useState("");
+    const [showNewFileForm, SetShowNewFileForm] = useState(false);
 
     function getDocuments () {
         axios.get(`${backendURL}/documents`, {withCredentials: true}).then((response) => {
@@ -36,14 +38,11 @@ function DocumentsSection() {
         SetDisplayedDocuments(filtered);
     };
 
-    async function handleFileSelection (file) {
-        let formData = new FormData();
-        formData.append("File", file);
-        await axios.post(`${backendURL}/documents`, formData, {withCredentials: true}).then((response) => {
-            SetMessage("File uploaded successfully!");
-            getDocuments();
-        });
-    };
+    function UploadFileCallback() {
+        SetShowNewFileForm(false);
+        SetMessage("File uploaded successfully!");
+        getDocuments();
+    }
 
     useEffect(() => {
         getDocuments();
@@ -61,16 +60,27 @@ function DocumentsSection() {
                     <AiIcons.AiOutlineSearch />
                 </div>
                 <div className="documents-upload-button">
-                    <input type="file" id="file" onChange={(e) => handleFileSelection(e.target.files[0])} hidden/>
-                    <label for="file" className="documents-upload-button-text"><span><AiIcons.AiOutlineUpload/> New file</span></label>
+                    <button className="documents-upload-button-button" onClick={() => SetShowNewFileForm(!showNewFileForm)}><span className="documents-upload-button-text"><AiIcons.AiOutlineUpload/> New file</span></button>
+                    {showNewFileForm ?
+                    <div className="new-file-form-popup">
+                        <NewFileForm callback={UploadFileCallback} />
+                    </div>
+                    :
+                    <></>
+                    }
                 </div>
             </div>
             
             <p style={{color: "green"}}>{message}</p>
+            <div className="documents-list-table-headers">
+                <p className="documents-list-name">Name</p>
+                <p className="documents-list-author">Author</p>
+                <p className="documents-list-date">Date</p>
+            </div>
             <div className="documents-list">
                 {displayedDocuments.map((item, index) => {
                     return (
-                        <DocumentsListItem name={item.name} author={item.author} date={item.date} type= {item.type} activeuser = {item.activeuser} callback={handleDeleteDocument}></DocumentsListItem>
+                        <DocumentsListItem name={item.name} author={item.author} date={item.date} type= {item.type} can_delete={item.can_delete} callback={handleDeleteDocument}></DocumentsListItem>
                     );
                 })}
             </div>

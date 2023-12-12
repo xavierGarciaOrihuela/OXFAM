@@ -12,7 +12,7 @@ function DocumentPage () {
     const [documentURL, setDocumentURL] = useState();
     const [message, setMessage] = useState('');
     let { name } = useParams();
-    const [activeChat, setActiveChat] = useState(true);
+    const [activeChat, setActiveChat] = useState(false);
 
     useEffect(() => {
         
@@ -35,7 +35,7 @@ function DocumentPage () {
                     <p>{message}</p>
                     <h1>{name}</h1>
                 </div>
-                <button onClick={() => setActiveChat(!activeChat)}>{activeChat ? <AiIcons.AiOutlineEyeInvisible /> : <AiIcons.AiOutlineEye />}{activeChat ? 'Close chat' : 'Open chat'}</button>
+                <button className="document-chat-view-button" onClick={() => setActiveChat(!activeChat)}>{activeChat ? <AiIcons.AiOutlineEyeInvisible /> : <AiIcons.AiOutlineEye />}{activeChat ? 'Close chat' : 'Open chat'}</button>
             </div>
             <div className="document-main">
                 <object className="document-viewer" data={documentURL} type="application/pdf">

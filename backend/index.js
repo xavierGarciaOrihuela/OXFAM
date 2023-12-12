@@ -53,7 +53,7 @@ app.get('/documents', async (req, res) => {
         const docs = await pool.query(query);
         if (docs.rowCount > 0) {
           docs.rows.forEach((document) => {
-            filenames.push({name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username });
+            filenames.push({name: document.nombre, author: document.autor, date: document.fecha, type: document.type, can_delete: (token.username == document.autor ? true : false )});
           });
         
         }  
@@ -67,7 +67,7 @@ app.get('/documents', async (req, res) => {
         if (docs.rowCount >= 0) {
           docs.rows.forEach((document) => {
             //nombre = document.nombre; 
-            filenames.push({ name: document.nombre, author: document.autor, date: document.fecha, type: token.type, activeuser: token.username});
+            filenames.push({ name: document.nombre, author: document.autor, date: document.fecha, type: '', can_delete: (token.username == document.autor ? true : false)});
           });
         }
       }
@@ -114,16 +114,20 @@ app.post('/documents', upload.single('File'), async function (req, res) {
     } else {
       console.log("NO api_key provided for ChatPDF");
     }
+    
+    const type = (token.type == 'private' ? (req.body.Type == 'true' ? 'private' : 'public') : 'public');
 
     // Insertar en la base de datos
     const query = 'INSERT INTO Documentos (nombre, autor, fecha, id_chatpdf, type) VALUES ($1, $2, $3, $4, $5) RETURNING *';
-    pool.query(query, [filename, token.username, date, document_chatpdf_id, token.type], (error, result) => {
+    pool.query(query, [filename, token.username, date, document_chatpdf_id, type], (error, result) => {
         if (error) {
             console.error('Error al insertar en la base de datos:', error);
             return res.status(500).send('Error interno del servidor');
         }
+        if(result) {
+          return res.status(201).json({'message': `${file.originalname} successfully uploaded.`});
+        }
     });
-    return res.status(201).json({'message': `${file.originalname} successfully uploaded.`});
 })
 
 // Endpoint per obtenir un fitxer donat el nom

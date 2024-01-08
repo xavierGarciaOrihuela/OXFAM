@@ -13,6 +13,17 @@ function DocumentPage () {
     const [message, setMessage] = useState('');
     let { name } = useParams();
     const [activeChat, setActiveChat] = useState(false);
+    const [infographicsButtonName,setInfographicsButtonName] = useState('Infographic');
+
+    function handleInfographicsDownload () {
+        setInfographicsButtonName('Generating');
+        axios.post(`${backendURL}/documents/${name}/infographic`)
+            .then((response) => {
+                setInfographicsButtonName('Infographic');
+                window.open(response.data.url, '_blank', 'noreferrer');
+            })
+            .catch()
+    };  
 
     useEffect(() => {
         
@@ -35,7 +46,10 @@ function DocumentPage () {
                     <p>{message}</p>
                     <h1>{name}</h1>
                 </div>
-                <button className="document-chat-view-button" onClick={() => setActiveChat(!activeChat)}>{activeChat ? <AiIcons.AiOutlineEyeInvisible /> : <AiIcons.AiOutlineEye />}{activeChat ? 'Close chat' : 'Open chat'}</button>
+                <div className="document-header-buttons">
+                    <button className="document-infographics-button" onClick={() => handleInfographicsDownload()}>{infographicsButtonName}</button>
+                    <button className="document-chat-view-button" onClick={() => setActiveChat(!activeChat)}>{activeChat ? <AiIcons.AiOutlineEyeInvisible /> : <AiIcons.AiOutlineEye />}{activeChat ? 'Close chat' : 'Open chat'}</button>
+                </div>
             </div>
             <div className="document-main">
                 <object className="document-viewer" data={documentURL} type="application/pdf">

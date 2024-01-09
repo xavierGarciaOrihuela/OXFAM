@@ -190,6 +190,23 @@ app.delete('/documents/:fileName', async (req, res) => {
     }
 });
 
+app.post('/documents/:filename/infographic', async (req, res) => {
+  const fileName = req.params.filename;
+
+  /*axios.post(flaskApiUrl + "/inforgraphic/" + fileName)
+    .then((response) => {
+      return res.status(200).json({url: response.data.url})
+    })
+    .catch((error) => {
+      console.log(error.message);
+      console.log("Response:", error.response.data);
+      return res.status(500).send(error.message);
+    });*/
+
+  const url = 'https://github.com/' // Image url
+  return res.status(200).json({url: url});
+});
+
 app.get('/individual_chat/:filename', async (req, res) => {
   const fileName = req.params.filename;
   const chatpdfID = await getDocumentChatPDFid(fileName);

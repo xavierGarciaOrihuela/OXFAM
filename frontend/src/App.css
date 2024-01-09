@@ -259,6 +259,12 @@ body {
   justify-content: space-between;
 }
 
+.document-header-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .document-main{
   flex: 1;
   display: flex;
@@ -407,6 +413,19 @@ body {
   border-radius: 20px;
   padding: 3px 10px ;
   width: 70px;
+}
+
+.document-infographics-button {
+  margin-right: 10px;
+  border: 1px solid black;
+  border-radius: var(--rectuangular-border-radius);
+  width: 110px;
+  height: 50px;
+  font-size: 1.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
 }
 
 .document-chat-view-button {

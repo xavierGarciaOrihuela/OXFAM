@@ -62,6 +62,21 @@ def api_ask():
     else:
         return jsonify({'error': 'Invalid request method'})
 
+@app.route('/api/prompt', methods=['POST'])
+def api_prompt():
+    if request.method == 'POST':
+        data = request.get_json()
+        query = data.get('prompt', None)
+        if query is None:
+            return jsonify({'error': 'Missing question in request'})
+        prompt = "My job is to create engaging visual infographics for blog posts. Act like an expert infographics creator and provide a visual description for the infographic that the graphic designer can then implement. The infographic should be visually appealing and easy to understand. The infographic should be based on a summary of the following document:" + query + ". Make a nice prompt to do an infographic with the title, the style and the content based on the summary of the document"
+        result = chain({"question": prompt, "chat_history": chat_history})
+        answer = result['answer']
+        chat_history.append((prompt, answer))
+        return jsonify({'answer': answer})
+    else:
+        return jsonify({'error': 'Invalid request method'})
+
 if __name__ == '__main__':
     chat_history = []
     app.run(host='0.0.0.0', port=5000)

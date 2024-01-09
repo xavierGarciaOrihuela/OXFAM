@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Copy the Python script into the container
 COPY app.py constants.py /app/
-RUN pip install openai
+RUN pip install openai flask flask-cors
 
 # Run the script when the container starts
 CMD ["python", "app.py"]

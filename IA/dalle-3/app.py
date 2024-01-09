@@ -1,20 +1,41 @@
 import constants
 import os
 
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 os.environ["OPENAI_API_KEY"] = constants.APIKEY
 from openai import OpenAI
 
-client = OpenAI()
-response = client.images.generate(
-  model="dall-e-3",
-  prompt="""Create an infographic illustrating the impact of COVID-19 on inequality, based on the document by Oxfam Intermón. Use a clean and professional layout with visually appealing elements. Include key statistics and data on the impact of the pandemic, emphasizing the disparities it has exacerbated. Highlight the contributions and collaboration of experts, academics, and organizations in the research process. Incorporate the Oxfam Intermón logo and contact information for further inquiries.""",
-  size="1024x1024",
-  quality="hd",
-  n=1,
-)
+app = Flask(__name__)
+CORS(app)
 
-image_url = response.data[0].url
-print(image_url)
+def get_image(prompt_arg):
+  client = OpenAI()
+  response = client.images.generate(
+    model="dall-e-3",
+    prompt=prompt_arg,
+    size="1024x1024",
+    quality="hd",
+    n=1,
+  )
+  image_url = response.data[0].url
+  return image_url
+
+@app.route('/api/infographic', methods=['POST'])
+def api_ask():
+      if request.method == 'POST':
+        data = request.get_json()
+        prompt_arg = data.get('prompt', None)
+        if prompt_arg is None:
+            return jsonify({'error': 'Missing prompt in request'})
+        result = get_image(prompt_arg)
+        return jsonify({'image_url': result})
+      else:
+        return jsonify({'error': 'Invalid request method'})
+
+if __name__ == '__main__':
+    chat_history = []
+    app.run(host='0.0.0.0', port=5001)
 
 # Create an infographic illustrating the impact of COVID-19 on inequality and poverty, based on the document by Oxfam Intermón. Use a clean and professional layout with visually appealing elements. Include key statistics and data on the impact of the pandemic, emphasizing the disparities it has exacerbated. Highlight the contributions and collaboration of experts, academics, and organizations in the research process. Incorporate the Oxfam Intermón logo and contact information for further inquiries.
 

@@ -2,6 +2,7 @@ import os
 import sys
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import requests
 
 import openai
 from langchain.chains import ConversationalRetrievalChain, RetrievalQA
@@ -62,18 +63,28 @@ def api_ask():
     else:
         return jsonify({'error': 'Invalid request method'})
 
-@app.route('/api/prompt', methods=['POST'])
-def api_prompt():
+@app.route('/infographic/<filename>', methods=['POST'])
+def api_prompt(filename):
     if request.method == 'POST':
-        data = request.get_json()
-        query = data.get('prompt', None)
-        if query is None:
+        if filename is None:
             return jsonify({'error': 'Missing question in request'})
-        prompt = "My job is to create engaging visual infographics for blog posts. Act like an expert infographics creator and provide a visual description for the infographic that the graphic designer can then implement. The infographic should be visually appealing and easy to understand. The infographic should be based on a summary of the following document:" + query + ". Make a nice prompt to do an infographic with the title, the style and the content based on the summary of the document"
+        prompt = "My job is to create engaging visual infographics for blog posts. Act like an expert infographics creator and provide a visual description for the infographic that the graphic designer can then implement. The infographic should be visually appealing and easy to understand. The infographic should be based on a summary of the following document:" + filename + ". Make a nice prompt to do an infographic with the title, the style and the content based on the summary of the document"
         result = chain({"question": prompt, "chat_history": chat_history})
         answer = result['answer']
-        chat_history.append((prompt, answer))
-        return jsonify({'answer': answer})
+        print(answer)
+        # Make a request to another Flask API
+        dalle_api_url = 'http://localhost:5001/api/infographic'  # Replace with your other API URL
+        dalle_api_data = {'prompt': answer}
+        try:
+            response = requests.post(dalle_api_url, json=dalle_api_data)
+            data = response.json()
+            image_url = data.get('image_url', None)
+            return jsonify({'url': image_url})
+        except requests.exceptions.RequestException as e:
+            print(e)
+            sys.exit(1)
+            return jsonify({'error': str(e)})
+        return jsonify({'url': 'https://github.com/'})
     else:
         return jsonify({'error': 'Invalid request method'})
 

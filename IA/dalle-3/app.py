@@ -14,7 +14,7 @@ def get_image(prompt_arg):
   response = client.images.generate(
     model="dall-e-3",
     prompt=prompt_arg,
-    size="1024x1024",
+    size="1792x1024",
     quality="hd",
     n=1,
   )
@@ -29,6 +29,7 @@ def api_ask():
         if prompt_arg is None:
             return jsonify({'error': 'Missing prompt in request'})
         result = get_image(prompt_arg)
+        print(result)
         return jsonify({'image_url': result})
       else:
         return jsonify({'error': 'Invalid request method'})

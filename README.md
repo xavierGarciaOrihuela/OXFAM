@@ -78,6 +78,8 @@ Install dependencies
   npm install
 ```
 
+Add your ChatPDF API key to the .env file
+
 Go to the frontend directory
 
 ```bash

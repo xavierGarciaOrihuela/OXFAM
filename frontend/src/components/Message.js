@@ -18,7 +18,7 @@ function Message ({message}) {
                     <p>Fonts:</p>
                     {message.sources.map((source, index) => {
                         return (
-                            <p><Link key={index} to={`/documents/${source}`} target="_blank">· {source}</Link></p>
+                            <p><Link key={index} to={`/home/documents/${source}`} target="_blank">· {source}</Link></p>
                         );
                     })}
                 </> : 

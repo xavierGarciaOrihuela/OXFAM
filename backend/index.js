@@ -191,21 +191,20 @@ app.delete('/documents/:fileName', async (req, res) => {
 });
 
 app.post('/documents/:filename/infographic', async (req, res) => {
-  const fileName = req.params.filename;
+  try {
+    const fileName = req.params.filename;
+    const flaskApiUrl2 = 'http://127.0.0.1:5000';
 
-  /*axios.post(flaskApiUrl + "/inforgraphic/" + fileName)
-    .then((response) => {
-      return res.status(200).json({url: response.data.url})
-    })
-    .catch((error) => {
-      console.log(error.message);
-      console.log("Response:", error.response.data);
-      return res.status(500).send(error.message);
-    });*/
+    const response = await axios.post(flaskApiUrl2 + "/infographic/" + fileName);
+    const url = response.data.url;
 
-  const url = 'https://github.com/' // Image url
-  return res.status(200).json({url: url});
+    return res.status(200).json({ url: url});
+  } catch (error) {
+    console.log(error.message);
+    return res.status(500).send(error.message);
+  }
 });
+
 
 app.get('/individual_chat/:filename', async (req, res) => {
   const fileName = req.params.filename;
